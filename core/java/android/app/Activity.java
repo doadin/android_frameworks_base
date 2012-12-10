@@ -2547,7 +2547,7 @@ public class Activity extends ContextThemeWrapper
                 // Put event logging here so it gets called even if subclass
                 // doesn't call through to superclass's implmeentation of each
                 // of these methods below
-                EventLog.writeEvent(50000, 0, item.getTitleCondensed());
+                EventLog.writeEvent(50000, 0, item.getTitleCondensed().toString());
                 if (onOptionsItemSelected(item)) {
                     return true;
                 }
@@ -2565,7 +2565,7 @@ public class Activity extends ContextThemeWrapper
                 return false;
                 
             case Window.FEATURE_CONTEXT_MENU:
-                EventLog.writeEvent(50000, 1, item.getTitleCondensed());
+                EventLog.writeEvent(50000, 1, item.getTitleCondensed().toString());
                 if (onContextItemSelected(item)) {
                     return true;
                 }
