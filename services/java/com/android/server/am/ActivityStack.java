@@ -46,6 +46,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -287,6 +288,13 @@ final class ActivityStack {
      * Is the privacy guard currently enabled?
      */
     String mPrivacyGuardPackageName = null;
+
+    /**
+     * Save the most recent screenshot for reuse. This keeps Recents from taking two identical
+     * screenshots, one for the Recents thumbnail and one for the pauseActivity thumbnail.
+     */
+    private ActivityRecord mLastScreenshotActivity = null;
+    private Bitmap mLastScreenshotBitmap = null;
 
     int mThumbnailWidth = -1;
     int mThumbnailHeight = -1;
@@ -945,8 +953,16 @@ final class ActivityStack {
         }
 
         if (w > 0) {
-            return mService.mWindowManager.screenshotApplications(who.appToken,
-                    Display.DEFAULT_DISPLAY, w, h);
+            if (who != mLastScreenshotActivity || mLastScreenshotBitmap == null
+                    || mLastScreenshotBitmap.getWidth() != w
+                    || mLastScreenshotBitmap.getHeight() != h) {
+                mLastScreenshotActivity = who;
+                mLastScreenshotBitmap = mService.mWindowManager.screenshotApplications(
+                        who.appToken, Display.DEFAULT_DISPLAY, w, h);
+            }
+            if (mLastScreenshotBitmap != null) {
+                return mLastScreenshotBitmap.copy(Config.ARGB_8888, true);
+            }
         }
         return null;
     }
