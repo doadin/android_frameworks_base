@@ -91,6 +91,7 @@ final class ActivityStack {
     static final boolean DEBUG_STATES = false;
     static final boolean DEBUG_ADD_REMOVE = false;
     static final boolean DEBUG_SAVED_STATE = false;
+    static final boolean DEBUG_APP = false;
 
     static final boolean VALIDATE_TOKENS = ActivityManagerService.VALIDATE_TOKENS;
     
@@ -667,6 +668,8 @@ final class ActivityStack {
 
         r.app = app;
         app.waitingToKill = null;
+        r.launchCount++;
+        r.lastLaunchTime = SystemClock.uptimeMillis();
 
         if (localLOGV) Slog.v(TAG, "Launching: " + r);
 
@@ -817,7 +820,7 @@ final class ActivityStack {
         // Is this activity's application already running?
         ProcessRecord app = mService.getProcessRecordLocked(r.processName,
                 r.info.applicationInfo.uid);
-        
+
         if (r.launchTime == 0) {
             r.launchTime = SystemClock.uptimeMillis();
             if (mInitialStartTime == 0) {
@@ -1105,6 +1108,7 @@ final class ActivityStack {
             // haven't really saved the state.
             r.icicle = icicle;
             r.haveState = true;
+            r.launchCount = 0;
             r.updateThumbnail(thumbnail, description);
         }
         if (!r.stopped) {
@@ -3986,6 +3990,7 @@ final class ActivityStack {
         if (setState) {
             if (DEBUG_STATES) Slog.v(TAG, "Moving to DESTROYED: " + r + " (cleaning up)");
             r.state = ActivityState.DESTROYED;
+            if (DEBUG_APP) Slog.v(TAG, "Clearing app during cleanUp for activity " + r);
             r.app = null;
         }
 
@@ -4043,6 +4048,7 @@ final class ActivityStack {
         if (DEBUG_STATES) Slog.v(TAG, "Moving to DESTROYED: " + r
                 + " (removed from history)");
         r.state = ActivityState.DESTROYED;
+        if (DEBUG_APP) Slog.v(TAG, "Clearing app during remove for activity " + r);
         r.app = null;
         mService.mWindowManager.removeAppToken(r.appToken);
         if (VALIDATE_TOKENS) {
@@ -4185,6 +4191,7 @@ final class ActivityStack {
                 if (DEBUG_STATES) Slog.v(TAG, "Moving to DESTROYED: " + r
                         + " (destroy skipped)");
                 r.state = ActivityState.DESTROYED;
+                if (DEBUG_APP) Slog.v(TAG, "Clearing app during destroy for activity " + r);
                 r.app = null;
             }
         } else {
@@ -4196,6 +4203,7 @@ final class ActivityStack {
                 if (DEBUG_STATES) Slog.v(TAG, "Moving to DESTROYED: " + r
                         + " (no app)");
                 r.state = ActivityState.DESTROYED;
+                if (DEBUG_APP) Slog.v(TAG, "Clearing app during destroy for activity " + r);
                 r.app = null;
             }
         }
@@ -4270,7 +4278,21 @@ final class ActivityStack {
             if (DEBUG_CLEANUP) Slog.v(
                 TAG, "Record #" + i + " " + r + ": app=" + r.app);
             if (r.app == app) {
+                boolean remove;
                 if ((!r.haveState && !r.stateNotNeeded) || r.finishing) {
+                    // Don't currently have state for the activity, or
+                    // it is finishing -- always remove it.
+                    remove = true;
+                } else if (r.launchCount > 2 &&
+                        r.lastLaunchTime > (SystemClock.uptimeMillis()-60000)) {
+                    // We have launched this activity too many times since it was
+                    // able to run, so give up and remove it.
+                    remove = true;
+                } else {
+                    // The process may be gone, but the activity lives on!
+                    remove = false;
+                }
+                if (remove) {
                     if (ActivityStack.DEBUG_ADD_REMOVE || DEBUG_CLEANUP) {
                         RuntimeException here = new RuntimeException("here");
                         here.fillInStackTrace();
@@ -4297,6 +4319,8 @@ final class ActivityStack {
                     if (r.visible) {
                         hasVisibleActivities = true;
                     }
+                    if (DEBUG_APP) Slog.v(TAG, "Clearing app during removeHistory for activity "
+                            + r);
                     r.app = null;
                     r.nowVisible = false;
                     if (!r.haveState) {
