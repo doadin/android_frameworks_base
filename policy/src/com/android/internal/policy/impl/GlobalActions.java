@@ -123,6 +123,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private boolean mHasTelephony;
     private boolean mHasVibrator;
     private Profile mChosenProfile;
+    private final boolean mShowSilentToggle;
 
     /**
      * @param context everything needs a context :(
@@ -155,6 +156,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 mAirplaneModeObserver);
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = vibrator != null && vibrator.hasVibrator();
+
+        mShowSilentToggle = SHOW_SILENT_TOGGLE && !mContext.getResources().getBoolean(
+                com.android.internal.R.bool.config_useFixedVolume);
     }
 
     /**
@@ -460,7 +464,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         }
 
         // last: silent mode
-        boolean showSoundMode = SHOW_SILENT_TOGGLE && Settings.System.getIntForUser(cr,
+        boolean showSoundMode = mShowSilentToggle && Settings.System.getIntForUser(cr,
                 Settings.System.POWER_MENU_SOUND_ENABLED, 1, UserHandle.USER_CURRENT) == 1;
         if (showSoundMode) {
             mItems.add(mSilentModeAction);
@@ -659,7 +663,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         mDialog.setTitle(R.string.global_actions);
 
-        if (SHOW_SILENT_TOGGLE) {
+        if (mShowSilentToggle) {
             IntentFilter filter = new IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION);
             mContext.registerReceiver(mRingerModeReceiver, filter);
         }
@@ -676,7 +680,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
     /** {@inheritDoc} */
     public void onDismiss(DialogInterface dialog) {
-        if (SHOW_SILENT_TOGGLE) {
+        if (mShowSilentToggle) {
             mContext.unregisterReceiver(mRingerModeReceiver);
         }
     }
