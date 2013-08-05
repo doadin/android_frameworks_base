@@ -1301,7 +1301,7 @@ public abstract class PreferenceActivity extends ListActivity implements
     }
 
     /**
-     * Start a new fragment containing a preference panel.  If the prefences
+     * Start a new fragment containing a preference panel.  If the preferences
      * are being displayed in multi-pane mode, the given fragment class will
      * be instantiated and placed in the appropriate pane.  If running in
      * single-pane mode, a new activity will be launched in which to show the
