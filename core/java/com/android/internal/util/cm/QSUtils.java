@@ -7,6 +7,8 @@ import android.content.res.Resources;
 import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.WifiDisplayStatus;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.nfc.NfcAdapter;
 import android.os.UserHandle;
@@ -70,5 +72,11 @@ public class QSUtils {
 
         public static boolean hasKernelFeature(String path) {
             return new File(path).exists();
+        }
+
+        public static boolean deviceSupportsCompass(Context context) {
+            SensorManager sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            return (sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null
+                    && sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null);
         }
 }
