@@ -96,14 +96,6 @@ public class QuickSettingsTile implements OnClickListener {
                 tv.setPadding(0, mTileTextPadding, 0, 0);
             }
         }
-        View image = mTile.findViewById(R.id.image);
-        if (image != null) {
-            MarginLayoutParams params = (MarginLayoutParams) image.getLayoutParams();
-            int margin = mContext.getResources().getDimensionPixelSize(
-                    R.dimen.qs_tile_ribbon_icon_margin);
-            params.topMargin = params.bottomMargin = margin;
-            image.setLayoutParams(params);
-        }
     }
 
     void onPostCreate() {}
