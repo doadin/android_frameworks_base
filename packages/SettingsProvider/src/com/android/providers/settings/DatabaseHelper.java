@@ -2007,6 +2007,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     R.string.def_lockscreen_targets);
             loadIntegerSetting(stmt, Settings.System.UI_FORCE_OVERFLOW_BUTTON,
                     R.integer.def_force_overflow_button);
+
+            loadIntegerSetting(stmt, Settings.System.DOUBLE_TAP_SLEEP_GESTURE,
+                    R.integer.def_double_tap_sleep_gesture);
+
         } finally {
             if (stmt != null) stmt.close();
         }
