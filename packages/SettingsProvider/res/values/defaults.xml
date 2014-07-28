@@ -196,4 +196,7 @@
 
     <!-- Default for Settings.System.UI_FORCE_OVERFLOW_BUTTON. -->
     <integer name="def_force_overflow_button">0</integer>
+
+    <!-- Default value of Settings.System.SCREEN_ANIMATION_STYLE -->
+    <integer name="def_screen_animation_style">0</integer>
 </resources>
