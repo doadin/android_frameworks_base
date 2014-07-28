@@ -71,7 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // database gets upgraded properly. At a minimum, please confirm that 'upgradeVersion'
     // is properly propagated through your change.  Not doing so will result in a loss of user
     // settings.
-    private static final int DATABASE_VERSION = 96;
+    private static final int DATABASE_VERSION = 95;
 
     private Context mContext;
     private int mUserHandle;
@@ -1526,13 +1526,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             upgradeVersion = 95;
         }
 
-        if (upgradeVersion == 95) {
-			if (mUserHandle == UserHandle.USER_OWNER) {
-				loadScreenAnimationStyle(db);
-			}
-			upgradeVersion = 96;
-		}
-
         // *** Remember to update DATABASE_VERSION above!
 
         if (upgradeVersion != currentVersion) {
@@ -1926,21 +1919,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private void loadScreenAnimationStyle(SQLiteDatabase db) {
-        db.beginTransaction();
-        SQLiteStatement stmt = null;
-        try {
-            stmt = db.compileStatement("INSERT OR REPLACE INTO system(name,value)"
-                    + " VALUES(?,?);");
-            loadIntegerSetting(stmt, Settings.System.SCREEN_ANIMATION_STYLE,
-                    R.integer.def_screen_animation_style);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-            if (stmt != null) stmt.close();
-        }
-    }
-
     private void loadSettings(SQLiteDatabase db) {
         loadSystemSettings(db);
         loadSecureSettings(db);
@@ -2010,6 +1988,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             loadIntegerSetting(stmt, Settings.System.DOUBLE_TAP_SLEEP_GESTURE,
                     R.integer.def_double_tap_sleep_gesture);
+
+            loadIntegerSetting(stmt, Settings.System.SCREEN_ANIMATION_STYLE,
+                    R.integer.def_screen_animation_style);
 
         } finally {
             if (stmt != null) stmt.close();
