@@ -22,10 +22,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Slog;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.GestureDetector;
+import android.os.PowerManager;
+import android.provider.Settings;
 
 import com.android.internal.util.pie.PiePosition;
 import com.android.systemui.R;
@@ -44,6 +48,7 @@ public class PhoneStatusBarView extends PanelBar {
     PanelView mLastFullyOpenedPanel = null;
     PanelView mNotificationPanel, mSettingsPanel;
     private boolean mShouldFade;
+    private GestureDetector mDoubleTapGesture;
 
     public PhoneStatusBarView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,6 +62,20 @@ public class PhoneStatusBarView extends PanelBar {
             mSettingsPanelDragzoneFrac = 0f;
         }
         mFullWidthNotifications = mSettingsPanelDragzoneFrac <= 0f;
+
+        mDoubleTapGesture = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+                Log.d(TAG, "Gesture!!");
+                if (pm != null)
+                    pm.goToSleep(e.getEventTime());
+                else
+                    Log.d(TAG, "getSystemService returned null PowerManager");
+
+                return true;
+            }
+        });
     }
 
     public void setBar(PhoneStatusBar bar) {
@@ -138,7 +157,7 @@ public class PhoneStatusBarView extends PanelBar {
 
         if (region < mSettingsPanelDragzoneMin) region = mSettingsPanelDragzoneMin;
 
-        return (w - x < region) ? mSettingsPanel : mNotificationPanel;
+        return (w - region < x) ? mSettingsPanel : mNotificationPanel;
     }
 
     @Override
@@ -195,7 +214,13 @@ public class PhoneStatusBarView extends PanelBar {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mBar.interceptTouchEvent(event) || super.onTouchEvent(event);
+        boolean barConsumedEvent = mBar.interceptTouchEvent(event);
+
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.DOUBLE_TAP_SLEEP_GESTURE, 0) == 1)
+            mDoubleTapGesture.onTouchEvent(event);
+
+        return barConsumedEvent || super.onTouchEvent(event);
     }
 
     @Override
