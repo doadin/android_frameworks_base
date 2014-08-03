@@ -455,7 +455,7 @@ class QuickSettings {
                     RSSIState rssiState = (RSSIState) state;
                     ImageView iv = (ImageView) view.findViewById(R.id.rssi_image);
                     ImageView iov = (ImageView) view.findViewById(R.id.rssi_overlay_image);
-                    TextView tv = (TextView) view.findViewById(R.id.rssi_textview);
+                    TextView tv = (TextView) view.findViewById(R.id.text);
                     iv.setImageResource(rssiState.signalIconId);
 
                     if (rssiState.dataTypeIconId > 0) {
