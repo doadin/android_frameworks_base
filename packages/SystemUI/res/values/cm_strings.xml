@@ -66,6 +66,9 @@
     <string name="quick_settings_lte_off">LTE off</string>
     <string name="quick_settings_volume">Volume</string>
     <string name="quick_settings_camera_label">Camera</string>
+    <string name="quick_settings_fcharge_usbwarning_label">Remove the USB cable</string>
+    <string name="quick_settings_fcharge_on_label">F-Charge Enabled</string>
+    <string name="quick_settings_fcharge_off_label">F-Charge Disabled</string>
 
     <!-- Expanded desktop strings break the rules a bit - the icon identifies the feature, the string indicates current state -->
     <string name="quick_settings_expanded_desktop">Expanded</string>

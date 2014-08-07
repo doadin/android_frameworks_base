@@ -12,6 +12,7 @@ import android.nfc.NfcAdapter;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import java.io.File;
 
 import com.android.internal.telephony.PhoneConstants;
 
@@ -65,5 +66,9 @@ public class QSUtils {
 
         public static boolean deviceSupportsCamera() {
             return Camera.getNumberOfCameras() > 0;
+        }
+
+        public static boolean hasKernelFeature(String path) {
+            return new File(path).exists();
         }
 }
