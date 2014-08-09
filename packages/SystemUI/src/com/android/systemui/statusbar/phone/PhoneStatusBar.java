@@ -460,11 +460,11 @@ public class PhoneStatusBar extends BaseStatusBar {
             QuickSettingsContainerView mRibbonContainer = (QuickSettingsContainerView)
                     mStatusBarWindow.findViewById(R.id.quick_settings_ribbon_container);
             if (mRibbonContainer != null) {
+				String settingsKey = mQuickAccessLayoutLinked
+				         ? Settings.System.QUICK_SETTINGS_TILES
+				         : Settings.System.QUICK_SETTINGS_RIBBON_TILES;
                 mRibbonQS = new QuickSettingsController(mContext, mRibbonContainer, this,
-                        mQuickAccessLayoutLinked ? Settings.System.QUICK_SETTINGS_TILES
-                            : Settings.System.QUICK_SETTINGS_RIBBON_TILES);
-                mRibbonQS.hideLiveTiles(true);
-                mRibbonQS.hideLiveTileLabels(true);
+                        settingsKey, true);
                 mRibbonQS.setService(this);
                 mRibbonQS.setBar(mStatusBarView);
                 mRibbonQS.setupQuickSettings();
@@ -750,7 +750,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                     mStatusBarWindow.findViewById(R.id.quick_settings_container);
             if (mSettingsContainer != null) {
                 mQS = new QuickSettingsController(mContext, mSettingsContainer, this,
-                        Settings.System.QUICK_SETTINGS_TILES);
+                        Settings.System.QUICK_SETTINGS_TILES, false);
                 if (!mNotificationPanelIsFullScreenWidth) {
                     mSettingsContainer.setSystemUiVisibility(
                             View.STATUS_BAR_DISABLE_NOTIFICATION_TICKER

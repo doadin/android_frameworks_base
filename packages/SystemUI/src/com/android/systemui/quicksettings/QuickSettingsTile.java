@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -64,14 +65,18 @@ public class QuickSettingsTile implements OnClickListener {
         mTile.setOnLongClickListener(mOnLongClick);
     }
 
-    public void setLabelVisibility(boolean visible) {
+    public void switchToRibbonMode() {
         TextView tv = (TextView) mTile.findViewById(R.id.text);
         if (tv != null) {
-            tv.setVisibility(visible ? View.VISIBLE : View.GONE);
+            tv.setVisibility(View.GONE);
         }
-        View sepPadding = mTile.findViewById(R.id.separator_padding);
-        if (sepPadding != null) {
-            sepPadding.setVisibility(visible ? View.VISIBLE : View.GONE);
+        View image = mTile.findViewById(R.id.image);
+        if (image != null) {
+            MarginLayoutParams params = (MarginLayoutParams) image.getLayoutParams();
+            int margin = mContext.getResources().getDimensionPixelSize(
+                    R.dimen.qs_tile_ribbon_icon_margin);
+            params.topMargin = params.bottomMargin = margin;
+            image.setLayoutParams(params);
         }
     }
 
